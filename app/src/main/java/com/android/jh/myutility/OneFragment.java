@@ -32,6 +32,7 @@ public class OneFragment extends Fragment implements View.OnClickListener{
         // 뷰를 재사용하기위해  Holder 형태로 만들어준다.
         if(view != null)
             return view;
+
         view = inflater.inflate(R.layout.fragment_one, container, false);
         btn0 = (Button)view.findViewById(R.id.button0);
         btn1 = (Button)view.findViewById(R.id.button1);
