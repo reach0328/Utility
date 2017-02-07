@@ -98,7 +98,8 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
         this.mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        // 신사역 좌표
+        LatLng sydney = new LatLng(37.516066, 127.019361);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,15));
     }
