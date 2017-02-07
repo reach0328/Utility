@@ -22,9 +22,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class FourFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
