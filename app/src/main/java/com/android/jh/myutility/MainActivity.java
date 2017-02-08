@@ -19,6 +19,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import java.util.Stack;
+
 /*
  *  GPS 사용 순서
  *  1. manifest에 FINE,COARSE 권한 추가
@@ -31,12 +33,17 @@ import android.widget.Toast;
  */
 public class MainActivity extends AppCompatActivity {
     final int TAB_COUNT = 4;
+    //현재 페이지
+    private int page_position = 0;
+    ViewPager viewPager;
     OneFragment oneFragment;
     TwoFragment twoFragment;
     ThreeFragment threeFragment;
     FourFragment fourFragment;
+    boolean backPress = false;
     //위치정보 관리자
     private LocationManager manager;
+    Stack<Integer> viewOrder= new Stack<>();
     public LocationManager getLocationManager() {
         return manager;
     }
@@ -44,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //메서드 추적 시작 -----
+//        Debug.startMethodTracing("trace_result");
 
         //프래그먼트 init
         oneFragment = new OneFragment();
@@ -60,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("지도"));
 
         // fragment pager 작성
-        ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
+        viewPager = (ViewPager)findViewById(R.id.viewPager);
 
         // adapter 생성
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
@@ -71,6 +80,32 @@ public class MainActivity extends AppCompatActivity {
 
         // 탭 리스너 :  탭이 변경 되었을대 페이지를 바꿔주는 리스너
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        //첫페이지 추가
+        viewOrder.push(0);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //스택 배열에 포지션을 저장해 놓는다
+                // 뒤로가기를 했을때는 스택 포지션을 쌓으면 안된다.
+                if(!backPress) {
+                    viewOrder.push(position);
+                } else {
+                    backPress = false;
+                }
+                page_position = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         //버전 체크해서 마시멜로우(6.0)보다 낮으면 런타임 권한 체크를 하지않는다.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -79,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
             init();
         }
     }
-
 
     class PagerAdapter extends FragmentStatePagerAdapter {
 
@@ -187,6 +221,34 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 return false;
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+
+        switch (page_position){
+            //webview 페이지에서 뒤로가기가 가능하면 아무런 동작하지 않는다
+            case 2:
+                if(threeFragment.goBack()) {
+                    //뒤로가기가 안되면 앱을 닫는다
+                } else {
+                    BackPage();
+                }
+                break;
+            // 위의 조건에 해당하지 않는 모든 케이스
+            default:
+                BackPage();
+                break;
+        }
+    }
+    public void BackPage() {
+        if(viewOrder.size()!=0){
+            backPress = true;
+             viewPager.setCurrentItem(viewOrder.pop());
+        }else {
+            super.onBackPressed();
         }
     }
 }
