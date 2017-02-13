@@ -20,8 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.android.jh.myutility.dummy.DummyContent;
-
 import java.util.Stack;
 
 /*
@@ -34,7 +32,7 @@ import java.util.Stack;
  *  6. Listener 실행
  *  7. Listener 해제
  */
-public class MainActivity extends AppCompatActivity implements FiveFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity {
     final int TAB_COUNT = 5;
     //현재 페이지
     private int page_position = 0;
@@ -119,11 +117,6 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
         } else {
             init();
         }
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
     }
 
 

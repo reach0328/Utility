@@ -20,31 +20,25 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.android.jh.myutility.dummy.DummyContent.DummyItem;
 import com.bumptech.glide.Glide;
 
 import static android.app.Activity.RESULT_OK;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class FiveFragment extends Fragment {
     // 카메라 요청 코드
     private final int REQ_CAMERA = 101;
-    // 겔러리 요청 코드
-    private final int REQ_GALLERY = 102;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 2;
-    private OnListFragmentInteractionListener mListener;
     Button btnCamera;
     RelativeLayout imgLayout;
     ImageView imgView;
+    View view;
+    MyItemRecyclerViewAdapter adapter;
+    RecyclerView recyclerView;
+
     public FiveFragment() {
 
     }
@@ -85,7 +79,7 @@ public class FiveFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        view = inflater.inflate(R.layout.fragment_item_list, container, false);
         btnCamera = (Button) view.findViewById(R.id.btnCamera);
         imgLayout = (RelativeLayout) view.findViewById(R.id.itemLayout);
         imgView = (ImageView) view.findViewById(R.id.imgDetail);
@@ -110,13 +104,14 @@ public class FiveFragment extends Fragment {
             }
         });
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-            if (mColumnCount <= 1) {
+            recyclerView = (RecyclerView) view.findViewById(R.id.list);
+            adapter = new MyItemRecyclerViewAdapter(getContext(),view);
+        if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(getContext(),mListener,view));
+            recyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -124,7 +119,6 @@ public class FiveFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Intent intent = null;
         Log.i("Camera", "resultCode===============================" + resultCode);
         switch (requestCode) {
             case REQ_CAMERA :
@@ -137,11 +131,11 @@ public class FiveFragment extends Fragment {
                     Log.i("Camera", "fileUri===============================" + fileUri);
                     if (fileUri != null) {
                         // 글라이드로 이미지 세팅하면 자동으로 사이즈 조절
-                        imgLayout.setVisibility(View.VISIBLE);
-                        btnCamera.setVisibility(View.GONE);
+                        detailImg();
                         Glide.with(this)
                                 .load(fileUri)
                                 .into(imgView);
+                        adapter.addToList(fileUri.toString());
                     } else {
                         Toast.makeText(getContext(), "사진파일이 없습니다", Toast.LENGTH_LONG).show();
                     }
@@ -152,32 +146,26 @@ public class FiveFragment extends Fragment {
                 break;
         }
     }
-
+    public void detailImg() {
+        imgLayout.setVisibility(View.VISIBLE);
+        btnCamera.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
-    }
     public boolean goBack() {
         if(imgLayout.getVisibility()==View.VISIBLE) {
             imgLayout.setVisibility(View.GONE);
             btnCamera.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
             return true;
         } else {
             return false;
