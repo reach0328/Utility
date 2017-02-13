@@ -100,7 +100,6 @@ public class FiveFragment extends Fragment {
                 }
                 // --- 여기 까지 컨텐트 uri 강제세팅 ---
                 startActivityForResult(intent, REQ_CAMERA);
-
             }
         });
             Context context = view.getContext();
@@ -174,5 +173,4 @@ public class FiveFragment extends Fragment {
         // webView.goBack();
         // return webView.canGoBack();
     }
-
 }
